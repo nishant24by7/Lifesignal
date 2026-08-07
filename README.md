@@ -2,6 +2,7 @@
 > **Spot the small shifts before they become big problems.**
 
 LifeSignal is a personal early-warning system powered by client-side explainable intelligence. It accepts messy, unstructured daily logs (expenses, sleep patterns, study hours, health symptoms, mood checks) and instantly structures them, computes rolling statistical baselines, detects multi-category anomalies, and provides human-friendly explanations with gentle preventive suggestions.
+<img width="1911" height="983" alt="image" src="https://github.com/user-attachments/assets/172531d5-18cc-4930-b4ed-4c45f2c5dda1" />
 
 ---
 
