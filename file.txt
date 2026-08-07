@@ -1,0 +1,181 @@
+Build a complete, modern, responsive web application for the following hackathon problem statement:
+
+Google Antigravity powered App that solves for societal benefit by helping individuals recognize unusual patterns in their daily lives before they become larger problems. Participants must create a functional interface that accepts unstructured personal data such as expenses, study hours, sleep patterns, or health logs and instantly converts them into structured insights by detecting anomalies, highlighting significant deviations, and providing easy-to-understand explanations.
+
+==================================================
+TECH STACK & CONSTRAINTS
+==================================================
+• Use React.js with JavaScript (NOT TypeScript)
+• Do NOT use TypeScript anywhere
+• Keep the backend minimal or completely optional
+• Prefer a frontend-only solution using local state + browser localStorage
+• If any backend is absolutely required, use a lightweight Node.js + Express server with in-memory storage only
+• Do NOT use MongoDB, Firebase, Supabase, SQL, or any cloud database
+• Do NOT use authentication or login systems
+• Hardcode all datasets, rules, sample data, thresholds, and configurations
+• The application must work completely offline after load (PWA-friendly if possible)
+• Use modern React (functional components + hooks)
+• Setup using Vite + React
+• Use Tailwind CSS for styling
+• Use Lucide-react for iconography
+• Use Recharts for clean, responsive data visualization
+• Use date-fns for relative human dates ("2 hours ago", "Yesterday at 11:30 PM")
+• Use uuid for unique IDs
+
+==================================================
+APP NAME & POSITIONING
+==================================================
+App Name: LifeSignal
+Tagline: Spot the small shifts before they become big problems.
+
+LifeSignal is a calm, personal early-warning system. Users log unstructured daily entries (expenses, sleep, study, mood, symptoms, habit logs). The app structures the data, detects anomalies, explains patterns in warm human language, and suggests gentle preventive actions — client-side, private, and offline.
+
+==================================================
+HUMAN-MADE UI / UX DESIGN SYSTEM (CRITICAL INSTRUCTIONS)
+==================================================
+Avoid generic AI template styling (e.g., harsh dark mode neon gradients, cheap glassmorphism overload, stock rounded cards with bright heavy borders). Instead, mirror the understated sophistication, tactile feel, and hyper-usability of consumer apps like Apple Health, Oura, Notion, and Linear.
+
+1. VISUAL AESTHETIC & PALETTE
+• Light Mode: Soft off-white canvas (#F8FAFC / #F9FAFB), warm neutral cards (#FFFFFF), hairline borders (#E2E8F0), deep slate typography (#0F172A).
+• Dark Mode: Warm charcoal/carbon canvas (#090D16), dark slate surfaces (#131C2E), subtle border definition (#1E293B), soft off-white text (#F1F5F9).
+• Semantic Accent Colors (Muted & Purposeful):
+  - Primary / Brand: Calm Deep Indigo (#4F46E5) or Warm Violet
+  - Safe / Positive: Warm Emerald (#059669 / soft pastel background)
+  - Caution / Deviation: Warm Amber (#D97706)
+  - Anomaly / Alert: Soft Rose (#E11D48)
+  - Information: Soft Slate Blue (#0EA5E9)
+
+2. TYPOGRAPHY & SPACING
+• Clean typographic hierarchy (Inter or system sans font family).
+• Generous whitespace and padding. Never overcrowd widgets or wrap numbers awkwardly.
+• Human-readable text sizing: large glanceable metrics with subtle grey units (e.g., "7.2 hrs", "₹1,850").
+
+3. TACTILE & HUMAN MICRO-INTERACTIONS
+• Subtle active scale down on buttons (`active:scale-[0.98] transition-transform duration-150`).
+• Soft background transitions on hover (`hover:bg-slate-100/80 dark:hover:bg-slate-800/50`).
+• Mobile bottom-sheets that feel slide-native for quick captures.
+• Skeleton loading states during data recalculations rather than harsh page jumps.
+• Toast notifications with small animated icons ("Entry logged & analyzed • 0.1s").
+
+4. LAYOUT & NAVIGATION
+• Desktop: Sleek, compact collapsible sidebar with clean icons, clear active indicator (left pillar pill), and user profile dummy avatar at bottom.
+• Mobile: True native bottom nav bar with backdrop blur (`backdrop-blur-md bg-white/90 dark:bg-slate-900/90`), subtle top border, clear touch targets (min 44px).
+• Top Bar: Minimal header with breadcrumbs, current context date, "Demo Mode" subtle pill, and search/quick-capture shortcut.
+
+==================================================
+CORE USER FLOW
+==================================================
+1. Land on a clean, peaceful dashboard prepopulated with 30+ days of realistic personal history.
+2. Quickly enter unstructured notes via free-text or structured speed-buttons.
+3. Watch the app instantly parse text, organize it into categories, and run anomaly detection.
+4. Review plain-language anomaly explanations without clinical jargon or math overload.
+5. Drill into category detail pages, adjust sensitivity thresholds, or toggle "Demo Story" mode.
+6. Everything remains saved locally in `localStorage`.
+
+==================================================
+DATA MODEL (LOCALSTORAGE BASE)
+==================================================
+Schema for logs:
+{
+  id: string,
+  timestamp: ISO string,
+  category: "expenses" | "sleep" | "study" | "health" | "mood" | "fitness" | "custom",
+  subcategory: string,
+  rawText: string,                 // e.g., "Spent 450 on late night swiggy dinner"
+  value: number | null,            // e.g., 450
+  unit: string | null,             // e.g., "INR", "hrs", "steps", "score"
+  tags: string[],
+  moodScore: number | null,        // 1-10
+  notes: string,
+  source: "manual" | "quick" | "demo",
+  createdAt: ISO string
+}
+
+Also store user preferences (thresholds, dark/light theme, alert settings, dismissed alerts).
+
+==================================================
+SMART INGESTION ENGINE (UNSTRUCTURED → STRUCTURED)
+==================================================
+Build a friction-free "Quick Capture" drawer/modal with 3 modes:
+
+1. Free-Text Natural Language Parser (Client-side Regex + Keyword Mapping):
+Examples to support seamlessly:
+• "slept only 4.5 hours woke up tired" → Sleep | 4.5 | hours | Tags: [tired, short-sleep]
+• "spent 1200 at starbucks with friends" → Expenses | 1200 | INR | Subcategory: Coffee/Food
+• "studied dsa for 3.5 hours" → Study | 3.5 | hours | Subcategory: Coding
+• "migraine headache since 3pm took tablet" → Health | Symptom: Migraine
+• "feeling anxious mood 3/10" → Mood | 3 | score
+• "walked 3200 steps today" → Fitness | 3200 | steps
+
+2. Structured Tap Input: Category dropdown, value input with auto-filling unit, tag selection pills.
+3. Confirmation Card: Shows a human preview ("We parsed this as **₹1,200** under **Expenses**") with quick 1-tap edits before saving.
+
+==================================================
+ANOMALY DETECTION & HUMAN EXPLANATION ENGINE
+==================================================
+Calculate rolling baselines (7-day, 14-day, 30-day averages, std dev, day-of-week patterns).
+
+Detection Rules (sensible defaults, adjustable in Settings):
+• Expenses: Single item > 2.5x 7-day average, or 3+ consecutive days of food delivery spikes.
+• Sleep: Drop of > 1.5 hours vs personal mean, or 3+ consecutive nights < 6 hours.
+• Study: Focus drop > 40% vs average, or overwork (> 10 hrs) leading to low mood.
+• Health/Mood: 2+ consecutive low mood days (≤ 3/10) or recurring physical symptoms.
+• Cross-Category Correlations:
+  - Low Sleep → Next-day high expenses / low study output.
+  - Late-night study → Poor sleep score.
+  - Dehydration + headache co-occurrence.
+
+Explanation Design:
+Never output raw formulas like "Z-score = 2.4". Output warm, thoughtful human insights:
+• "You've slept an average of 5.1 hours over the last 3 nights — roughly 2 hours less than your baseline. Short sleep streaks often show up before focus drops."
+• "Food ordering spending is up 2.2x this week. Noticeably, 3 of these orders occurred after 11 PM following low-mood entries."
+
+==================================================
+PAGES & FEATURE ARCHITECTURE
+==================================================
+1. Dashboard (Home):
+   - Life Stability Score (0-100 gauge ring).
+   - "Needs Attention" anomaly cards (priority ranked with action recommendations).
+   - Quick capture bar + FAB.
+   - Category summary cards with trend sparklines.
+   - Today's comparison chips vs 30-day baseline.
+
+2. Insights & Anomalies Inbox:
+   - Filter by severity (Critical, Warning, Insight), category, or resolved status.
+   - Expandable cards showing detailed evidence, related raw entries, and "Is this expected?" snooze buttons.
+
+3. Category Explorer:
+   - Deep-dive tabs for Expenses, Sleep, Study, Health, and Mood.
+   - Custom metric cards, subcategory pie/bar charts, heatmap calendar for mood/sleep.
+
+4. Patterns & Correlations Lab:
+   - Visual cards showing "When X happens, Y usually follows".
+   - Day-of-week breakdown (e.g., "Mondays tend to have the lowest sleep").
+
+5. Weekly / Monthly Digest:
+   - Auto-generated summary report card.
+   - Top wins, top burnout/risk factors, and 3 actionable micro-steps.
+   - Clean print/copy view.
+
+6. Settings & Data Control:
+   - Sensitivity sliders (Relaxed / Balanced / Strict).
+   - Load seed dataset, Export JSON, Import JSON, Reset application.
+
+==================================================
+SAMPLE DATA & DEMO STORY MODE
+==================================================
+• Seed the app with 35 days of realistic, nuanced personal logs across all categories.
+• Include a "Run Demo Story" button in the header that walks judges through a 60-second interactive scenario:
+  Step 1: Normal healthy week baseline.
+  Step 2: 3 days of late-night study sessions.
+  Step 3: Sleep drop to 4.5 hours.
+  Step 4: Mood drop + expense surge on food delivery.
+  Step 5: LifeSignal detects the chain reaction and recommends an early pause.
+
+==================================================
+DELIVERABLE EXPECTATION
+==================================================
+• Fully functional React single-page app with Vite + Tailwind CSS.
+• Modular code structure (`/components`, `/hooks`, `/data`, `/utils`).
+• Beautiful, human, real-world visual polish.
+• Includes a README with setup instructions and a 60-second judge presentation script.
